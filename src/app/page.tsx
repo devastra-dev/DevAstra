@@ -1,26 +1,44 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { Hero } from "@/components/home/Hero";
-import { FeaturedProducts } from "@/components/home/FeaturedProducts";
-import { Reveal } from "@/components/ui/Reveal";
-import { Particles } from "@/components/ui/Particles";
 import Link from "next/link";
+
+/* 🔥 SSR SAFE DYNAMIC IMPORTS */
+const Particles = dynamic(
+  () => import("@/components/ui/Particles").then(m => m.Particles),
+  { ssr: false }
+);
+
+const Hero = dynamic(
+  () => import("@/components/home/Hero").then(m => m.Hero),
+  { ssr: false }
+);
+
+const FeaturedProducts = dynamic(
+  () => import("@/components/home/FeaturedProducts").then(m => m.FeaturedProducts),
+  { ssr: false }
+);
+
+const Reveal = dynamic(
+  () => import("@/components/ui/Reveal").then(m => m.Reveal),
+  { ssr: false }
+);
 
 export default function HomePage() {
   return (
     <main className="relative overflow-hidden">
 
-      {/* 🌌 PARTICLES BACKGROUND */}
+      {/* 🌌 PARTICLES (SAFE) */}
       <Particles />
 
-      {/* 🌌 GLOW BACKGROUND */}
+      {/* 🌌 BACKGROUND */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute w-[500px] h-[500px] bg-cyan-500/20 blur-[120px] rounded-full top-[-100px] left-1/3 animate-pulse" />
         <div className="absolute w-[400px] h-[400px] bg-blue-500/20 blur-[120px] rounded-full bottom-[-100px] right-10 animate-pulse" />
       </div>
 
-      {/* 📦 MAIN CONTENT */}
+      {/* 📦 CONTENT */}
       <div className="container-page pt-24 pb-20 space-y-32">
 
         {/* 🚀 HERO */}
@@ -32,7 +50,7 @@ export default function HomePage() {
           <Hero />
         </motion.div>
 
-        {/* 🔒 TRUST BAR (NEW) */}
+        {/* 🔒 TRUST BAR */}
         <Reveal>
           <div className="grid grid-cols-3 gap-4 text-center text-sm text-slate-400">
             <div className="glass-panel py-4">⚡ Instant Download</div>
@@ -41,7 +59,7 @@ export default function HomePage() {
           </div>
         </Reveal>
 
-        {/* 💎 FEATURED PRODUCTS */}
+        {/* 💎 PRODUCTS */}
         <Reveal>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -52,7 +70,7 @@ export default function HomePage() {
           </motion.div>
         </Reveal>
 
-        {/* ⚡ WHY SECTION (NEW) */}
+        {/* ⚡ WHY */}
         <Reveal>
           <div className="grid md:grid-cols-3 gap-8 text-center">
 
@@ -80,7 +98,7 @@ export default function HomePage() {
           </div>
         </Reveal>
 
-        {/* 🚀 FINAL CTA (NEW) */}
+        {/* 🚀 CTA */}
         <Reveal>
           <div className="text-center space-y-6">
 

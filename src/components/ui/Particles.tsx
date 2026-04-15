@@ -1,40 +1,71 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Particle = {
   top: string;
   left: string;
-  duration: string;
+  size: number;
+  opacity: number;
+  duration: number;
+  delay: number;
 };
 
 export function Particles() {
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // 🔥 generate only on client (fix hydration)
-    const generated = Array.from({ length: 20 }).map(() => ({
+    setMounted(true);
+  }, []);
+
+  // 🔥 generate once (no re-renders)
+  const particles: Particle[] = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
-      duration: `${2 + Math.random() * 3}s`
+      size: Math.random() * 3 + 1,
+      opacity: Math.random() * 0.5 + 0.2,
+      duration: Math.random() * 4 + 2,
+      delay: Math.random() * 2
     }));
-
-    setParticles(generated);
   }, []);
+
+  // 🔐 prevent SSR mismatch
+  if (!mounted) return null;
 
   return (
     <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       {particles.map((p, i) => (
         <span
           key={i}
-          className="absolute block w-1 h-1 bg-cyan-400/40 rounded-full animate-pulse"
+          className="absolute rounded-full bg-cyan-400"
           style={{
             top: p.top,
             left: p.left,
-            animationDuration: p.duration
+            width: p.size,
+            height: p.size,
+            opacity: p.opacity,
+            animation: `float ${p.duration}s ease-in-out infinite`,
+            animationDelay: `${p.delay}s`,
+            filter: "blur(1px)"
           }}
         />
       ))}
+
+      {/* 🔥 custom animation */}
+      <style jsx>{`
+        @keyframes float {
+          0% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+          100% {
+            transform: translateY(0px);
+          }
+        }
+      `}</style>
     </div>
   );
 }
