@@ -1,0 +1,233 @@
+export interface Product {
+  id: string;
+  title: string;
+  description: string;
+  tagline: string;
+  stackLabel: string;
+
+  priceInINR: number;
+  originalPrice?: number; // 🔥 discount support
+  discountPercent?: number;
+
+  isFree?: boolean; // 🔥 FREE vs PAID system
+
+  downloadUrl: string;
+
+  highlights: string[];
+
+  // 🔥 MEDIA
+  images: string[];
+  demoVideo?: string;
+
+  // 🔥 DETAILS
+  features: string[];
+
+  // 🔥 OPTIONAL
+  badge?: string;
+  isFeatured?: boolean;
+
+  // 🔥 FUTURE (no break)
+  offerEndsAt?: string;
+}
+
+export const products: Product[] = [
+  // =========================
+  // 🧲 FREE PRODUCT (FUNNEL)
+  // =========================
+  {
+    id: "free-ui-kit",
+    title: "Free 3d-flip-card-animation Starter Kit",
+    description:
+      "A high-performance 3D UI component with smooth animations and scalable structure, designed for modern web applications.",
+
+    tagline: "Where Design Meets Interaction.",
+    stackLabel: "Si-Fi UI Core",
+
+    priceInINR: 0,
+    isFree: true, // 🔥 IMPORTANT
+
+    downloadUrl:
+      "https://drive.google.com/uc?export=download&id=1pwjAMtzktonnxqMVMomO9s8t0kSZk5_N",
+
+    highlights: ["Free", "Starter UI", "Reusable"],
+
+    images: [
+      "/products/free-1.png",
+      "/products/free-2.png"
+    ],
+
+    features: [
+      "Cinematic 3D Flip Interactions",
+      "Fluid Micro-Animations",
+      "Ultra-Modern Glass UI Design",
+      "Seamless Cross-Device Experience",
+      "Optimized for High Performance"
+    ],
+
+    badge: "FREE"
+  },
+
+
+
+  {
+    id: "free-ui-kit-2",
+    title: "Free 3d-flip-card-animation Starter Kit",
+    description:
+      "Clean and modern UI starter kit to kickstart your projects.",
+
+    tagline: "Start building instantly",
+    stackLabel: "Next.js • Tailwind",
+
+    priceInINR: 0,
+    isFree: true, // 🔥 IMPORTANT
+
+    downloadUrl:
+      "https://drive.google.com/uc?export=download&id=1pwjAMtzktonnxqMVMomO9s8t0kSZk5_N",
+
+    highlights: ["Free", "Starter UI", "Reusable"],
+
+    images: [
+      "/products/free-1.png",
+      "/products/free-2.png"
+    ],
+
+    features: [
+      "Clean UI components",
+      "Responsive design",
+      "Easy to customize"
+    ],
+
+    badge: "FREE"
+  }, 
+
+  // =========================
+  // 💰 PREMIUM
+  // =========================
+  {
+    id: "futuristic-ai-voice-interface-ui-kit",
+    title: "Futuristic AI Voice Interface UI Kit",
+    description:
+      "Production-ready UI kit for creating futuristic AI voice interfaces. Includes modern design elements and seamless integration.",
+
+    tagline: "Beyond Intelligence. Beyond Reality.",
+    stackLabel: "Quantum Stack",
+
+    priceInINR: 19, // 🔥 FIX (24 was unrealistic)
+    originalPrice: 299,
+    discountPercent: 94, // 🔥 AUTO CALCULATED
+
+    downloadUrl:
+      "https://drive.google.com/uc?export=download&id=1hK9Kt6RF32YzaZ1PdPGjhv9SGVhEpYTQ",
+
+    highlights: [
+      "Auth + billing",
+      "Modern UI",
+      "Email templates"
+    ],
+
+    images: [
+      "/products/voice-1.png",
+      "/products/voice-2.png",
+      "/products/voice-3.png"
+    ],
+
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+
+    features: [
+      "Ultra-Fast AI Powered Interface",
+      "Advanced Secure Authentication",
+      "Instant Smart Payment System",
+      "Intelligent Admin Dashboard",
+      "Future-Proof Scalable System"
+    ],  
+
+    badge: "Best Seller",
+    isFeatured: true,
+
+    offerEndsAt: "2026-06-01"
+  },
+// ========================= NO : 2 =========================
+  {
+    id: "interactive-periodic-table-ui-kit",
+    title: "Interactive Periodic Table UI",
+    description:
+      "A futuristic interactive periodic table with fluid animations and rich data visualization, designed for next-gen learning experiences.",
+
+    tagline: "Chemistry Meets Innovation",
+    stackLabel: "Interactive Science UI",
+
+    priceInINR: 9,
+    originalPrice: 99,
+    discountPercent: 91,
+
+    downloadUrl:
+      "https://drive.google.com/uc?export=download&id=1RY0Gd3UAah0yJjBPnHOzh93UULs6t7mU",
+
+    highlights: [
+      "Real-time element interaction",
+      "Fluid hover & transition effects",
+      "Visually rich modern interface"
+    ],
+
+    images: [
+      "/products/periodic1.png",
+      "/products/periodic2.png",
+      "/products/periodic3.png"
+    ],
+
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+
+    features: [
+      "Dynamic element interaction system",
+      "Cinematic micro-animations",
+      "Rich data-driven element display",
+      "Seamless cross-device experience",
+      "High-performance rendering engine"
+    ],
+
+    badge: "Popular",
+    isFeatured: true
+  },
+// ========================= NO : 3 =========================
+  {
+    id: "luxury-ai-marketplace-build",
+    title: "Luxury AI Landing Bundle",
+    description:
+      "An elite set of conversion-optimized landing page templates engineered for AI products, SaaS platforms, and high-growth startups.",
+
+
+    tagline: "Design to Convert. Built to Scale.",
+    stackLabel: "Conversion System • Premium UI",
+
+    priceInINR: 1499,
+    originalPrice: 2999,
+    discountPercent: 50,
+
+    downloadUrl:
+      "https://drive.google.com/uc?export=download&id=1UyYSR302bLoZZEhyMdLUcMxeb-LBsbhX",
+
+    highlights: [
+      "Conversion-driven UI layouts",
+      "Premium modern design language",
+      "Performance & SEO optimized"
+    ],
+
+    images: [
+      "/products/landing-1.png",
+      "/products/landing-2.png",
+      "/products/landing-3.png"
+    ],
+
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+
+    features: [
+      "High-conversion landing page designs",
+      "SEO-optimized structure",
+      "Fully responsive across devices",
+      "Blazing fast performance",
+      "Easy customization & scalability"
+    ],
+
+    badge: "New"
+  }
+];

@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================
+   🌙 THEME (DARK DEFAULT)
+========================= */
+:root {
+  color-scheme: dark;
+}
+
+/* =========================
+   🧱 BASE STYLES
+========================= */
+html,
+body {
+  @apply bg-[#020617] text-white min-h-screen;
+}
+
+body {
+  @apply antialiased selection:bg-cyan-400/30 selection:text-cyan-100;
+}
+
+/* =========================
+   📦 CONTAINER
+========================= */
+.container-page {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* =========================
+   💎 GLASS UI (CARDS)
+========================= */
+.glass-panel {
+  @apply bg-slate-900/50 border border-slate-700/60 backdrop-blur-xl rounded-2xl shadow-lg;
+}
+
+/* =========================
+   🔘 BUTTONS
+========================= */
+
+/* primary gradient button */
+.btn-gradient {
+  @apply inline-flex items-center justify-center rounded-full 
+  bg-gradient-to-r from-cyan-400 via-sky-500 to-blue-600 
+  text-black font-semibold px-5 py-2.5 text-sm 
+  shadow-lg shadow-cyan-500/20 
+  transition duration-300 
+  hover:scale-105 hover:shadow-cyan-400/40;
+}
+
+/* secondary button */
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-full 
+  border border-slate-700 bg-slate-900/60 
+  text-slate-200 px-5 py-2.5 text-sm 
+  transition duration-300 
+  hover:bg-slate-800 hover:border-slate-500;
+}
+
+/* =========================
+   ✨ TEXT STYLES
+========================= */
+.text-gradient {
+  @apply bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 bg-clip-text text-transparent;
+}
+
+/* =========================
+   🎯 INPUT / FORM
+========================= */
+.input {
+  @apply w-full rounded-lg bg-slate-900 border border-slate-700 
+  px-3 py-2 text-sm text-white 
+  focus:outline-none focus:ring-2 focus:ring-cyan-500;
+}
+
+/* =========================
+   🧊 CARD HOVER EFFECT
+========================= */
+.card-hover {
+  @apply transition duration-300 hover:scale-[1.02] hover:shadow-xl;
+}
+
+/* =========================
+   🌈 SCROLLBAR (OPTIONAL PREMIUM)
+========================= */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0ea5e9;
+  border-radius: 999px;
+}
+
+/* =========================
+   ✨ SMOOTH ANIMATION FIX
+========================= */
+* {
+  scroll-behavior: smooth;
+}
