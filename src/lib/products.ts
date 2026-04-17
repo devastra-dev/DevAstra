@@ -67,7 +67,7 @@ export const products: Product[] = [
     badge: "FREE"
   },
 
-
+// ========================= NO : 2 =========================
 
   {
     id: "free-ui-kit-2",
@@ -100,9 +100,9 @@ export const products: Product[] = [
     badge: "FREE"
   }, 
 
-  // =========================
+  // =============================================================================================================================
   // 💰 PREMIUM
-  // =========================
+  // ==============================================================================================================================
   {
     id: "futuristic-ai-voice-interface-ui-kit",
     title: "Futuristic AI Voice Interface UI Kit",
@@ -229,5 +229,47 @@ export const products: Product[] = [
     ],
 
     badge: "New"
+  },
+// ========================= NO : 3 =========================
+  {
+    id: "premium-ai-marketplace-ui",
+    title: "AI Marketplace System",
+    description:
+      "A next-generation marketplace UI crafted for AI products, digital assets, and smart services, built to deliver a seamless and high-converting user experience.",
+
+    tagline: "Powering the Next Era of Digital Commerce.",
+    stackLabel: "Autonomous Commerce Engine",
+
+    priceInINR: 1699,
+    originalPrice: 3699,
+    discountPercent: 54,
+
+    downloadUrl:
+      "https://drive.google.com/uc?export=download&id=1lIOKnHx1es5QqvEiQ84VZ9BsubPeR2pZ",
+
+    highlights: [
+      "Next-gen AI marketplace design",
+      "Seamless product discovery experience",
+      "Conversion-driven UI system"
+    ],
+
+    images: [
+      "/products/Nexus-1.png",
+      "/products/Nexus-2.png",
+      "/products/Nexus-3.png"
+    ],
+
+    demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+
+    features: [
+      "Advanced AI product marketplace layout",
+      "Smart product showcase & browsing",
+      "Fully responsive & mobile optimized",
+      "Fast and optimized performance",
+      "Flexible and scalable architecture"
+    ],
+
+    badge: "New"
   }
+
 ];

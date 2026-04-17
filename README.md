@@ -105,7 +105,4 @@ Visit `http://localhost:3000`.
 
 
 
-git remote add origin https://github.com/devastra-dev/DevAstra.git
-git branch -M main
-git pull origin main --allow-unrelated-histories
-git push -u origin main
+git add . && git commit -m "update" && git push

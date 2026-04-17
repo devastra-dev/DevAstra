@@ -28,6 +28,7 @@ export default function PrivacyPage() {
       </p>
 
       <h2 className="text-xl text-white">4. Third Parties</h2>
+    
       <p>
         Payments handled via Razorpay. We do not store card details.
       </p>
