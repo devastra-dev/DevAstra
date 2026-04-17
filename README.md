@@ -105,4 +105,4 @@ Visit `http://localhost:3000`.
 
 
 
-git add . && git commit -m "update" && git push
+git add .; git commit -m "update"; git push
