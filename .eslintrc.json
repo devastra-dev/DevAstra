@@ -1,11 +1,4 @@
 {
-  "extends": [
-    "next/core-web-vitals"
-  ],
-  "plugins": [
-    "react-hooks"
-  ],
-  "rules": {
-    "react-hooks/exhaustive-deps": "warn"
-  }
+  "extends": ["next/core-web-vitals"],
+  "plugins": ["@next/eslint-plugin-next"]
 }
