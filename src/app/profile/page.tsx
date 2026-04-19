@@ -85,6 +85,7 @@ export default function ProfilePage() {
   }
 
   function copyUID() {
+    if (!user) return;
     navigator.clipboard.writeText(user.uid).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
