@@ -199,8 +199,8 @@ export const products: Product[] = [
     tagline: "Design to Convert. Built to Scale.",
     stackLabel: "Conversion System • Premium UI",
 
-    priceInINR: 1499,
-    originalPrice: 2999,
+    priceInINR: 499,
+    originalPrice: 999,
     discountPercent: 50,
 
     downloadUrl:
@@ -240,9 +240,9 @@ export const products: Product[] = [
     tagline: "Powering the Next Era of Digital Commerce.",
     stackLabel: "Autonomous Commerce Engine",
 
-    priceInINR: 1699,
-    originalPrice: 3699,
-    discountPercent: 54,
+    priceInINR: 699,
+    originalPrice: 1199,
+    discountPercent: 42,
 
     downloadUrl:
       "https://drive.google.com/uc?export=download&id=1lIOKnHx1es5QqvEiQ84VZ9BsubPeR2pZ",
@@ -270,6 +270,62 @@ export const products: Product[] = [
     ],
 
     badge: "New"
+  },
+
+// ========================= NO : 4 =========================
+
+  {
+  id: "freelancer-os-pro",
+
+  title: "Freelancer OS — Premium Client, Project & Invoice System",
+
+  description:
+    "A production-ready freelancer operating system designed to manage clients, projects, and invoicing workflows in a single, high-performance environment. Built for serious freelancers and agencies who want a scalable, modern system instead of fragmented tools.",
+
+  tagline: "Run Your Freelance Business Like a System, Not Chaos.",
+
+  stackLabel: "Full-Stack Freelancer SaaS System",
+
+  priceInINR: 2499,
+  originalPrice: 5999,
+  discountPercent: 58,
+
+  downloadUrl:
+    "https://drive.google.com/uc?export=download&id=1EjC8xm9WylCtDEK6BCoBc0sN-qxp4GxU",
+
+  highlights: [
+    "Complete freelancer operating system (not just UI)",
+    "Client, project & invoice workflow automation",
+    "Real SaaS architecture with Supabase backend",
+    "High-end futuristic UI with premium UX",
+    "Built for scalability and real-world usage"
+  ],
+
+  images: [
+    "/products/Invoice-1.png",
+    "/products/Invoice-2.png",
+    "/products/Invoice-3.png"
+  ],
+
+  demoVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+
+  features: [
+    "Advanced client management with persistent database (Supabase)",
+    "Project tracking system with real-time status updates",
+    "Invoice generation with item-based billing logic",
+    "User authentication with isolated data per account",
+    "Dashboard analytics for earnings, payments & performance",
+    "Fully responsive layout optimized for all devices",
+    "Modern glassmorphism + neon UI design system",
+    "Scalable architecture suitable for SaaS expansion",
+    "Clean modular code structure (Next.js + hooks system)",
+    "Ready-to-deploy production-grade frontend + backend integration",
+    "Everything you need to run a real freelance business, not just a UI kit",
+    "Every process is mentioned in the product documentation, making it easy to understand and customize for your specific needs"
+  ],
+
+  badge: "Pro"
   }
 
 ];
+
