@@ -55,7 +55,7 @@ export default function ProductDetailPage() {
     }
     setBusy(true);
     try {
-      window.location.href = product.downloadUrl;
+      window.location.assign(product.downloadUrl);
     } catch {
       alert("Download failed");
     } finally {
@@ -82,7 +82,7 @@ export default function ProductDetailPage() {
         alert(data?.error || "Download failed");
         return;
       }
-      window.location.href = data.url;
+      window.location.assign(data.url);
     } catch {
       alert("Download error");
     } finally {
@@ -121,6 +121,7 @@ export default function ProductDetailPage() {
         alert(orderData?.error || "Order failed");
         return;
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const Rz = (window as any).Razorpay;
       if (!Rz) {
         alert("Payment not loaded");
@@ -133,9 +134,11 @@ export default function ProductDetailPage() {
         name: "DevAstra",
         description: product.title,
         order_id: orderData.orderId,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         handler: async (res: any) => {
           const verifyToken = await user.getIdToken();
-          const verifyRes = await fetch("/api/razorpay/verify", {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const verifyRes = await fetch("/api/razorpay/verify", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -4,7 +4,7 @@ import { products, Product } from "@/lib/products";
 import Link from "next/link";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { usePurchaseStatus } from "@/hooks/usePurchaseStatus";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 
 /* ─────────────────────────────────────────────────
    FONT INJECTION  (Orbitron for headings)
@@ -118,13 +118,20 @@ const globalStyles = `
    FLOATING PARTICLES BACKGROUND
 ───────────────────────────────────────────────── */
 function ParticleField() {
-  const particles = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    delay: `${Math.random() * 8}s`,
-    duration: `${6 + Math.random() * 8}s`,
-    size: Math.random() > 0.7 ? 3 : 2,
-  }));
+  const particles = useMemo(
+    () => Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      // eslint-disable-next-line react-hooks/purity
+      left: `${Math.random() * 100}%`,
+      // eslint-disable-next-line react-hooks/purity
+      delay: `${Math.random() * 8}s`,
+      // eslint-disable-next-line react-hooks/purity
+      duration: `${6 + Math.random() * 8}s`,
+      // eslint-disable-next-line react-hooks/purity
+      size: Math.random() > 0.7 ? 3 : 2,
+    })),
+    []
+  );
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">

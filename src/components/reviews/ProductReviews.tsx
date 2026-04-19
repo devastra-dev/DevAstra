@@ -67,7 +67,7 @@ export function ProductReviews({ productId }: { productId: string }) {
       setError(null);
       const data = await getReviewsWithStats(productId);
 
-      let sorted = [...data.reviews];
+      const sorted = [...data.reviews];
 
       if (sort === "highest") {
         sorted.sort((a, b) => b.rating - a.rating);
@@ -83,7 +83,7 @@ export function ProductReviews({ productId }: { productId: string }) {
   };
 
   useEffect(() => {
-    load();
+    load(); // eslint-disable-line react-hooks/exhaustive-deps
   }, [productId, sort]);
 
   const formatDate = (value: unknown) => {

@@ -263,7 +263,7 @@ export default function SupportPage() {
           </div>
 
           {/* WHATSAPP */}
-          <a href="https://wa.me/919339016057" target="_blank"
+          <a href="https://wa.me/919339016057" target="_blank" rel="noreferrer"
             className="flex items-center gap-3 w-full px-5 py-3.5 rounded-xl text-sm font-medium text-green-400 transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(37,211,102,0.15)]"
             style={{ border: "1px solid rgba(37,211,102,0.2)", background: "rgba(37,211,102,0.05)" }}>
             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="#25d366">

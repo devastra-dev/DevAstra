@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useAnimationFrame } from "framer-motion";
 import Link from "next/link";
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
 
 /* ── SSR-SAFE DYNAMIC IMPORTS ─────────────────────────────────────────── */
 const Particles = dynamic(

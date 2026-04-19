@@ -129,7 +129,7 @@ export async function GET(
         ip: req.headers.get("x-forwarded-for") || "unknown",
         userAgent: req.headers.get("user-agent") || "unknown"
       });
-    } catch (e: any) {
+    } catch (e: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       console.warn("❌ Download blocked:", e?.message);
 
       return NextResponse.json(

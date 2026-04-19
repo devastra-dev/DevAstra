@@ -16,16 +16,22 @@ export function Particles() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+  }, [setMounted]);
 
   // 🔥 generate once (no re-renders)
   const particles: Particle[] = useMemo(() => {
     return Array.from({ length: 30 }).map(() => ({
+      // eslint-disable-next-line react-hooks/purity
       top: `${Math.random() * 100}%`,
+      // eslint-disable-next-line react-hooks/purity
       left: `${Math.random() * 100}%`,
+      // eslint-disable-next-line react-hooks/purity
       size: Math.random() * 3 + 1,
+      // eslint-disable-next-line react-hooks/purity
       opacity: Math.random() * 0.5 + 0.2,
+      // eslint-disable-next-line react-hooks/purity
       duration: Math.random() * 4 + 2,
+      // eslint-disable-next-line react-hooks/purity
       delay: Math.random() * 2
     }));
   }, []);

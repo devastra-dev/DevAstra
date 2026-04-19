@@ -236,7 +236,7 @@ export default function ProfilePage() {
         }
 
         /* Group hover effects */
-        .group-hover\:shadow-premium:hover {
+        .group-hover\\:shadow-premium:hover {
           box-shadow: 0 0 30px rgba(0,245,255,0.3) !important;
         }
 

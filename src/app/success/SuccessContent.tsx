@@ -29,12 +29,13 @@ export default function SuccessContent() {
     }
 
     // ✅ valid payment
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     setValid(true);
 
     // 🔥 clear flag
     localStorage.removeItem("payment_success");
 
-  }, [productId, router]);
+  }, [productId, router, setValid]);
 
   // 🔥 DOWNLOAD FUNCTION
   const handleDownload = async () => {
