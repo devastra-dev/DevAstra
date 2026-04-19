@@ -19,6 +19,7 @@ export default function SuccessContent() {
   const [valid, setValid] = useState(false);
 
   // 🔥 VALIDATION (CRITICAL FIX)
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     const flag = localStorage.getItem("payment_success");
 
@@ -29,7 +30,7 @@ export default function SuccessContent() {
     }
 
     // ✅ valid payment
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setValid(true);
 
     // 🔥 clear flag

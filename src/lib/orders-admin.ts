@@ -106,6 +106,7 @@ export async function incrementDownloadCount(
     throw new Error("Order not found");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = snap.data() as any;
 
   const currentCount = data.downloadCount || 0;

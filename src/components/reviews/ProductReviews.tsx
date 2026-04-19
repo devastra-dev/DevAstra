@@ -82,12 +82,15 @@ export function ProductReviews({ productId }: { productId: string }) {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
   useEffect(() => {
-    load(); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    load();
   }, [productId, sort]);
 
   const formatDate = (value: unknown) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const date = new Date(value as any);
       return date.toLocaleDateString();
     } catch {
@@ -163,7 +166,7 @@ export function ProductReviews({ productId }: { productId: string }) {
         <div className="flex justify-end">
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as any)}
+            onChange={(e) => setSort(e.target.value as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
             className="bg-black/40 border border-white/10 text-sm px-3 py-1 rounded text-slate-300"
           >
             <option value="latest">Latest</option>

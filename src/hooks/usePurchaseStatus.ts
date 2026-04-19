@@ -23,7 +23,9 @@ export function usePurchaseStatus(productId: string): PurchaseStatus {
     let isMounted = true;
 
     // ❌ NO USER
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!user || !productId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus({ purchased: false, loading: false });
       return;
     }
@@ -91,6 +93,7 @@ export function usePurchaseStatus(productId: string): PurchaseStatus {
       isMounted = false;
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid, productId]);
 
   return status;

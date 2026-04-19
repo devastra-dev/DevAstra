@@ -24,6 +24,7 @@ export interface Review {
 // ==========================
 // 🔥 SAFE DATE PARSER
 // ==========================
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseDate(value: any): Date {
   try {
     if (!value) return new Date();

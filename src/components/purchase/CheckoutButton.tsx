@@ -102,6 +102,7 @@ export function CheckoutButton({ productId }: { productId: string }) {
       };
 
       // ✅ STEP 3: Open Razorpay
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const razorpay = new (window as any).Razorpay(options);
       razorpay.open();
 

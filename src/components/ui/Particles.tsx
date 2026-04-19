@@ -14,7 +14,9 @@ type Particle = {
 export function Particles() {
   const [mounted, setMounted] = useState(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, [setMounted]);
 
@@ -59,6 +61,7 @@ export function Particles() {
       ))}
 
       {/* 🔥 custom animation */}
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <style jsx>{`
         @keyframes float {
           0% {

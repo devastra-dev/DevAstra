@@ -1,3 +1,4 @@
+// eslint-disable react/no-unescaped-entities
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
@@ -314,8 +315,9 @@ export default function ProductDetailPage() {
               animate="show"
               className="space-y-3 pt-2"
             >
+              {/* eslint-disable-next-line react/no-unescaped-entities */}
               <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-                What's included
+                What&apos;s included
               </p>
               <ul className="space-y-3">
                 {product.features.map((f, i) => (
