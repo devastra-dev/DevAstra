@@ -637,6 +637,97 @@ export default function HomePage() {
 
         <GlowDivider />
 
+        {/* ── ABOUT FOUNDER ───────────────────────────────────────── */}
+        <Reveal>
+          <section className="relative">
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+
+              {/* 🖼 IMAGE */}
+              <motion.div
+                initial={{ opacity: 0, x: -32 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="flex justify-center"
+              >
+                <div className="relative w-56 h-56 rounded-2xl overflow-hidden border border-white/10 shadow-xl group">
+                  <img
+                    src="/founder.jpg"
+                    alt="Founder"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {/* glow overlay */}
+                  <div className="absolute inset-0 bg-cyan-500/10 blur-2xl opacity-30" />
+                  {/* animated border glow on hover */}
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl border border-cyan-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  />
+                  {/* bottom gradient fade */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-slate-950/60 to-transparent" />
+                </div>
+              </motion.div>
+
+              {/* 📄 TEXT */}
+              <motion.div
+                initial={{ opacity: 0, x: 32 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-4"
+              >
+                {/* eyebrow */}
+                <p className="text-xs font-semibold tracking-[0.25em] uppercase text-cyan-400">
+                  Meet the Creator
+                </p>
+
+                <h2 className="text-3xl font-bold text-white leading-tight">
+                  About the{" "}
+                  <span className="bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
+                    Creator
+                  </span>
+                </h2>
+
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Hi, I&apos;m <span className="text-white font-medium">Subhranshu Khatua</span> — a developer
+                  passionate about building high-performance AI tools and production-ready SaaS products.
+                </p>
+
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  I created <span className="bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
+                  DevAstra
+                  </span> to eliminate the pain of starting from scratch every single time.
+                </p>
+
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Whether you&apos;re a solo founder, a student, or a dev agency — DevAstra gives you
+                  battle-tested, scalable codebases so you can focus on what actually matters -
+                  <span className="text-cyan-400 font-medium"> shipping your product.</span>
+                </p>
+
+                <p className="text-slate-400 text-sm">
+                 I don&apos;t believe in building for demos. I build for production.
+                </p>
+
+                {/* divider line */}
+                <div className="w-12 h-px bg-gradient-to-r from-cyan-400/60 to-transparent" />
+
+                {/* signature */}
+                <p className="text-cyan-400 font-medium pt-1 flex items-center gap-2">
+                  <motion.span
+                    animate={{ opacity: [1, 0.5, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block"
+                  />
+                  Developed by — Subhranshu Khatua
+                </p>
+              </motion.div>
+
+            </div>
+          </section>
+        </Reveal>
+
+        <GlowDivider />
+
         {/* ── FINAL CTA ───────────────────────────────────────────── */}
         <Reveal>
           <section className="relative text-center">
