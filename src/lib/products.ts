@@ -70,31 +70,37 @@ export const products: Product[] = [
 // ========================= NO : 2 =========================
 
   {
-    id: "free-ui-kit-2",
-    title: "Free 3d-flip-card-animation Starter Kit",
+    id: "jarvis-fullstack-starter",
+    title: "JARVIS Fullstack (Frontend + Backend) Starter Kit",
     description:
-      "Clean and modern UI starter kit to kickstart your projects.",
-
-    tagline: "Start building instantly",
-    stackLabel: "Next.js • Tailwind",
+       "A complete JARVIS-inspired AI assistant starter kit with both frontend UI and backend logic. Designed for developers who want to build a real AI-powered system fast.This is released completely free so you can test it in real-world use, push its limits, and give honest feedback. Based on your feedback, this project will continuously evolve with better features, performance, and capabilities.",
+    tagline: "UI + Backend — Build a Real AI Assistant",
+    stackLabel: "Fullstack SaaS System",
 
     priceInINR: 0,
     isFree: true, // 🔥 IMPORTANT
 
     downloadUrl:
-      "https://drive.google.com/uc?export=download&id=1pwjAMtzktonnxqMVMomO9s8t0kSZk5_N",
+      "https://drive.google.com/uc?export=download&id=1Etx3PeudL-jAObjReJ959WtVG0tWjqOU",
 
-    highlights: ["Free", "Starter UI", "Reusable"],
+    highlights: [" Completely Free"," Fullstack Starter", "Real AI Assistant"],
 
     images: [
-      "/products/free-1.png",
-      "/products/free-2.png"
+      "/products/ChatGPT_9.16.png",
+      "/products/ChatGPT_9.17.png"
     ],
 
     features: [
-      "Clean UI components",
-      "Responsive design",
-      "Easy to customize"
+      "Futuristic JARVIS-style UI dashboard",
+      "Backend API for command handling & responses",
+      "Voice assistant integration ready (STT + TTS support)",
+      "Modular architecture (frontend + backend separated)",
+      "Real-time communication (API/WebSocket ready)",
+      "Clean and scalable code structure",
+      "Easy integration with AI APIs (OpenAI, Groq, etc.)",
+      "Task execution system (open apps, search, automation ready)",
+      "Responsive design with smooth animations",
+      "Beginner-friendly but expandable to advanced systems"
     ],
 
     badge: "FREE"
