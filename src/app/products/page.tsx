@@ -220,46 +220,55 @@ export default function ProductsPage() {
         {/* Particle field */}
         <ParticleField />
 
-        <div className="container-page pt-28 pb-24 space-y-20">
+        <div className="container-page pt-28 pb-24 space-y-24">
 
           {/* ── PREMIUM HEADER ── */}
-          <div className="space-y-5 text-center md:text-left relative">
+          <div className="space-y-6 text-center md:text-left relative">
             {/* corner bracket decoration */}
-            <div className="hidden md:block absolute -left-6 -top-4 w-8 h-8 border-l-2 border-t-2 border-cyan-500/40" />
+            <div className="hidden md:block absolute -left-6 -top-4 w-10 h-10 border-l-2 border-t-2 border-cyan-500/40 rounded-tl-sm" />
+            <div className="hidden md:block absolute -left-6 -top-4 w-3 h-3 bg-cyan-400/60 rounded-full blur-sm" />
 
             {/* eyebrow label */}
-            <p className="share-tech text-xs text-cyan-500/70 tracking-[0.25em] uppercase">
+            <p className="share-tech text-xs text-cyan-500/70 tracking-[0.25em] uppercase flex items-center gap-2 justify-center md:justify-start">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               ◈ PRODUCT CATALOG v2.0
             </p>
 
             {/* glitch main title */}
             <h1
-              className="orbitron glitch-text text-5xl md:text-6xl font-black text-white tracking-widest"
+              className="orbitron glitch-text text-5xl md:text-7xl font-black tracking-widest"
               data-text="PRODUCTS"
               style={{
-                textShadow: "0 0 30px rgba(0,255,200,0.15), 0 0 60px rgba(0,200,255,0.08)",
+                background: "linear-gradient(135deg, #ffffff 0%, #22d3ee 40%, #818cf8 70%, #ffffff 100%)",
+                backgroundSize: "200% 200%",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                animation: "holo-shift 5s ease-in-out infinite",
+                filter: "drop-shadow(0 0 30px rgba(0,255,200,0.12))",
               }}
             >
               PRODUCTS
             </h1>
 
             {/* sub line */}
-            <p className="share-tech text-slate-400 max-w-lg text-sm tracking-wider">
+            <p className="share-tech text-slate-400 max-w-lg text-base tracking-wider leading-relaxed">
               Explore futuristic developer tools &amp; premium assets.
             </p>
 
             {/* stat chips */}
-            <div className="flex gap-4 flex-wrap mt-2 justify-center md:justify-start">
+            <div className="flex gap-4 flex-wrap mt-3 justify-center md:justify-start">
               <StatChip label="FREE" count={freeProducts.length} color="#00ffc8" />
               <StatChip label="PREMIUM" count={paidProducts.length} color="#00b4ff" />
+              <StatChip label="TOTAL" count={products.length} color="#a78bfa" />
             </div>
 
             {/* decorative separator */}
-            <div className="flex items-center gap-3 mt-6 justify-center md:justify-start">
+            <div className="flex items-center gap-3 mt-8 justify-center md:justify-start">
               <div className="h-[1px] flex-1 max-w-xs"
-                style={{ background: "linear-gradient(to right, rgba(0,255,200,0.4), transparent)" }}
+                style={{ background: "linear-gradient(to right, rgba(0,255,200,0.5), rgba(0,180,255,0.2), transparent)" }}
               />
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+              <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
             </div>
           </div>
 
@@ -267,9 +276,9 @@ export default function ProductsPage() {
           {freeProducts.length > 0 && (
             <section className="space-y-8">
               <SectionHeader label="Free Products" color="#4ade80" tag="FREE_TIER" />
-              <div className="grid gap-8 md:grid-cols-3">
+              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
                 {freeProducts.map((p, i) => (
-                  <TiltCard key={p.id} product={p} delay={i * 0.1} />
+                  <TiltCard key={p.id} product={p} delay={i * 0.08} />
                 ))}
               </div>
             </section>
@@ -278,9 +287,9 @@ export default function ProductsPage() {
           {/* ── PREMIUM PRODUCTS ── */}
           <section className="space-y-8">
             <SectionHeader label="Premium Products" color="#67e8f9" tag="PRO_TIER" />
-            <div className="grid gap-8 md:grid-cols-3">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {paidProducts.map((p, i) => (
-                <TiltCard key={p.id} product={p} delay={i * 0.1} />
+                <TiltCard key={p.id} product={p} delay={i * 0.08} />
               ))}
             </div>
           </section>
@@ -297,15 +306,17 @@ export default function ProductsPage() {
 function StatChip({ label, count, color }: { label: string; count: number; color: string }) {
   return (
     <div
-      className="share-tech text-xs px-3 py-1.5 rounded-full flex items-center gap-2"
+      className="share-tech text-xs px-4 py-2 rounded-full flex items-center gap-2.5 transition-all duration-300 hover:scale-105 cursor-default"
       style={{
-        border: `1px solid ${color}30`,
-        background: `${color}08`,
+        border: `1px solid ${color}35`,
+        background: `${color}0a`,
         color,
+        boxShadow: `0 0 12px ${color}08`,
       }}
     >
-      <span className="opacity-60">{label}</span>
-      <span className="font-bold" style={{ animation: "count-up 0.6s ease forwards" }}>
+      <span className="w-1.5 h-1.5 rounded-full" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
+      <span className="opacity-70">{label}</span>
+      <span className="font-bold text-sm" style={{ animation: "count-up 0.6s ease forwards" }}>
         {count}
       </span>
     </div>
@@ -413,12 +424,14 @@ function TiltCard({ product, delay }: { product: Product; delay: number }) {
       <div className="absolute inset-0 rounded-2xl border border-white/8 pointer-events-none" />
 
       {/* ── MAIN CARD BODY ── */}
-      <div className="relative rounded-2xl bg-[#070c18] p-6 overflow-hidden"
+      <div className="relative rounded-2xl p-6 overflow-hidden"
         style={{
+          background: "linear-gradient(145deg, rgba(7,12,24,0.95), rgba(10,18,36,0.9))",
+          backdropFilter: "blur(16px)",
           boxShadow: spotlight.active
-            ? `0 0 40px rgba(0,255,200,0.06), inset 0 1px 0 rgba(255,255,255,0.04)`
-            : `0 0 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`,
-          transition: "box-shadow 0.3s ease",
+            ? `0 0 50px rgba(0,255,200,0.08), 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)`
+            : `0 0 20px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)`,
+          transition: "box-shadow 0.4s ease, background 0.4s ease",
         }}
       >
         {/* MOUSE SPOTLIGHT */}
@@ -455,24 +468,44 @@ function TiltCard({ product, delay }: { product: Product; delay: number }) {
         </div>
 
         {/* IMAGE AREA */}
-        <div className="mt-2 h-44 rounded-xl overflow-hidden relative"
-          style={{ border: "1px solid rgba(255,255,255,0.06)" }}
+        <div className="mt-2 h-48 rounded-xl overflow-hidden relative"
+          style={{ border: "1px solid rgba(255,255,255,0.08)" }}
         >
           <img
             src={product.images?.[0]}
             alt={product.title}
-            className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
-            style={{ opacity: spotlight.active ? 0.95 : 0.65, transition: "opacity 0.4s, transform 0.7s" }}
+            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+            style={{ opacity: spotlight.active ? 0.95 : 0.7, transition: "opacity 0.4s, transform 0.7s, filter 0.7s" }}
           />
           {/* gradient overlay */}
           <div className="absolute inset-0"
-            style={{ background: "linear-gradient(to top, rgba(7,12,24,0.9) 0%, rgba(7,12,24,0.3) 60%, transparent 100%)" }}
+            style={{ background: "linear-gradient(to top, rgba(7,12,24,0.95) 0%, rgba(7,12,24,0.4) 50%, rgba(7,12,24,0.1) 100%)" }}
+          />
+          {/* holographic sheen on hover */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+            style={{ background: "linear-gradient(135deg, transparent 30%, rgba(0,255,200,0.06) 50%, rgba(0,180,255,0.04) 60%, transparent 70%)" }}
           />
           {/* corner HUD marks */}
-          <div className="absolute top-2 left-2 w-3 h-3 border-t border-l border-cyan-400/40" />
-          <div className="absolute top-2 right-2 w-3 h-3 border-t border-r border-cyan-400/40" />
-          <div className="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-cyan-400/40" />
-          <div className="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-cyan-400/40" />
+          <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-cyan-400/40 transition-all duration-300 group-hover:border-cyan-400/70 group-hover:w-5 group-hover:h-5" />
+          <div className="absolute top-2 right-2 w-4 h-4 border-t border-r border-cyan-400/40 transition-all duration-300 group-hover:border-cyan-400/70 group-hover:w-5 group-hover:h-5" />
+          <div className="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-cyan-400/40 transition-all duration-300 group-hover:border-cyan-400/70 group-hover:w-5 group-hover:h-5" />
+          <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-cyan-400/40 transition-all duration-300 group-hover:border-cyan-400/70 group-hover:w-5 group-hover:h-5" />
+          {/* badge overlay */}
+          {product.badge && (
+            <div className="absolute top-3 right-3 z-10">
+              <span
+                className="share-tech text-[9px] px-2.5 py-1 rounded-full tracking-widest uppercase"
+                style={{
+                  background: "rgba(0,180,255,0.15)",
+                  border: "1px solid rgba(0,180,255,0.35)",
+                  color: "#67e8f9",
+                  backdropFilter: "blur(8px)",
+                }}
+              >
+                {product.badge}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* FREE BADGE */}
@@ -523,7 +556,7 @@ function TiltCard({ product, delay }: { product: Product; delay: number }) {
           </h2>
 
           {/* description */}
-          <p className="text-[12px] text-slate-500 line-clamp-2 leading-relaxed mt-1">
+          <p className="text-[12.5px] text-slate-400/80 line-clamp-2 leading-relaxed mt-1.5">
             {product.description}
           </p>
 
@@ -568,27 +601,29 @@ function TiltCard({ product, delay }: { product: Product; delay: number }) {
           {/* CTA BUTTON */}
           <Link
             href={`/products/${product.id}`}
-            className="btn-shine mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300"
+            className="btn-shine mt-5 w-full inline-flex items-center justify-center gap-2.5 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-400 group/btn"
             style={{
-              background: "rgba(0,0,0,0.6)",
-              border: "1px solid rgba(0,229,255,0.25)",
+              background: "linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(0,180,255,0.04) 100%)",
+              border: "1px solid rgba(0,229,255,0.2)",
               color: "#67e8f9",
               fontFamily: "'Share Tech Mono', monospace",
-              letterSpacing: "0.05em",
+              letterSpacing: "0.08em",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "rgba(0,229,255,0.08)";
+              (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, rgba(0,229,255,0.15) 0%, rgba(0,180,255,0.08) 100%)";
               (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,229,255,0.5)";
-              (e.currentTarget as HTMLElement).style.boxShadow = "0 0 20px rgba(0,229,255,0.15)";
+              (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(0,229,255,0.12), 0 0 60px rgba(0,229,255,0.05)";
+              (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "rgba(0,0,0,0.6)";
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,229,255,0.25)";
+              (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(0,180,255,0.04) 100%)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,229,255,0.2)";
               (e.currentTarget as HTMLElement).style.boxShadow = "none";
+              (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
             }}
           >
             <span>VIEW PRODUCT</span>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="transition-transform duration-300 group-hover:translate-x-1">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="transition-transform duration-300 group-hover/btn:translate-x-1">
               <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </Link>
