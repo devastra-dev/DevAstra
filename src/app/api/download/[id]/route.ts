@@ -39,7 +39,11 @@ export async function GET(
       );
     }
 
-    console.log("📥 DOWNLOAD REQUEST:", productId);
+    // Log in development only
+    if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console
+      console.log("📥 DOWNLOAD REQUEST:", productId);
+    }
 
     // =========================
     // 🔐 AUTH
@@ -63,8 +67,12 @@ export async function GET(
     );
 
     if (!product) {
-      console.warn("❌ Product NOT FOUND:", productId);
-      console.log("Available:", products.map((p) => p.id));
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console
+        console.warn("❌ Product NOT FOUND:", productId);
+        // eslint-disable-next-line no-console
+        console.log("Available:", products.map((p) => p.id));
+      }
 
       return NextResponse.json(
         { error: "Product not found" },
@@ -84,7 +92,10 @@ export async function GET(
       );
     }
 
-    console.log("✅ PURCHASE VERIFIED:", email, product.id);
+    if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console
+      console.log("✅ PURCHASE VERIFIED:", email, product.id);
+    }
 
     // =========================
     // 🔗 DOWNLOAD SOURCE RESOLUTION
@@ -99,12 +110,19 @@ export async function GET(
       if (!("error" in signedUrlResult)) {
         downloadUrl = signedUrlResult.url;
         source = "storage";
-        console.log("🚀 Using Firebase Storage");
-      } else {
+        if (process.env.NODE_ENV === "development") {
+          // eslint-disable-next-line no-console
+          console.log("🚀 Using Firebase Storage");
+        }
+      } else if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console
         console.warn("⚠️ Storage not found → fallback");
       }
     } catch (e) {
-      console.warn("⚠️ Storage error → fallback", e);
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console
+        console.warn("⚠️ Storage error → fallback", e);
+      }
     }
 
     // 🔥 FALLBACK → GOOGLE DRIVE
@@ -118,7 +136,10 @@ export async function GET(
 
       downloadUrl = product.downloadUrl;
       source = "drive";
-      console.log("🚀 Using Google Drive fallback");
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console
+        console.log("🚀 Using Google Drive fallback");
+      }
     }
 
     // =========================
@@ -129,8 +150,11 @@ export async function GET(
         ip: req.headers.get("x-forwarded-for") || "unknown",
         userAgent: req.headers.get("user-agent") || "unknown"
       });
-    } catch (e: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-      console.warn("❌ Download blocked:", e?.message);
+    } catch (e: unknown) {
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console
+        console.warn("❌ Download blocked:", (e as { message?: string })?.message);
+      }
 
       return NextResponse.json(
         { error: "Download limit reached (max 5)" },
@@ -148,7 +172,10 @@ export async function GET(
     });
 
   } catch (err) {
-    console.error("❌ DOWNLOAD ERROR:", err);
+    if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console
+      console.error("❌ DOWNLOAD ERROR:", err);
+    }
 
     return NextResponse.json(
       { error: "Internal server error" },

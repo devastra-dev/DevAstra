@@ -113,7 +113,7 @@ export default function RefundPage() {
         @keyframes r-pulse    { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);} }
       `}</style>
 
-      <main className="refund-page font-['Rajdhani',sans-serif] relative min-h-screen" style={{ color: "#a8d8e8" }}>
+      <main className="refund-page font-['Rajdhani',sans-serif] relative min-h-screen" style={{ color: "#a8d8e8", position: "relative" }}>
 
         {/* Ambient blobs */}
         <div className="r-blob" style={{ width: 420, height: 420, background: "rgba(255,68,85,0.05)", top: -80, right: -100 }} />

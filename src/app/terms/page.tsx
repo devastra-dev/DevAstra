@@ -92,7 +92,7 @@ export default function TermsPage() {
         @keyframes t-pulse    { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);} }
       `}</style>
 
-      <main className="terms-page font-['Rajdhani',sans-serif] relative min-h-screen" style={{ color: "#a8d8e8" }}>
+      <main className="terms-page font-['Rajdhani',sans-serif] relative min-h-screen" style={{ color: "#a8d8e8", position: "relative" }}>
 
         {/* Blobs */}
         <div className="t-blob" style={{ width: 400, height: 400, background: "rgba(157,111,255,0.06)", top: -80, left: -100 }} />

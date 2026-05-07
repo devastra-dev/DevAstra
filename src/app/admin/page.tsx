@@ -28,7 +28,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20, position: "relative" }}>
       <h1>Admin Panel</h1>
 
       <input placeholder="Title" onChange={(e) => setTitle(e.target.value)} />

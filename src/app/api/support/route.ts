@@ -108,7 +108,10 @@ export async function POST(req: NextRequest) {
       createdAt: new Date()
     });
 
-    console.log("📩 Support ticket saved:", docRef.id);
+    if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console
+      console.log("📩 Support ticket saved:", docRef.id);
+    }
 
     // =========================
     // 🔥 ADMIN EMAIL (SAFE)
@@ -129,7 +132,10 @@ export async function POST(req: NextRequest) {
         });
       }
     } catch (e) {
-      console.warn("⚠️ Admin email failed:", e);
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console
+        console.warn("⚠️ Admin email failed:", e);
+      }
     }
 
     // =========================
@@ -159,7 +165,10 @@ export async function POST(req: NextRequest) {
         });
       }
     } catch (e) {
-      console.warn("⚠️ User email failed:", e);
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console
+        console.warn("⚠️ User email failed:", e);
+      }
     }
 
     // =========================
@@ -171,6 +180,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error("❌ SUPPORT API ERROR:", err);
 
     return NextResponse.json(

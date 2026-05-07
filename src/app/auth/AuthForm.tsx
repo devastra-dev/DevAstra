@@ -531,7 +531,7 @@ export default function AuthForm() {
 
   /* ── Render ── */
   return (
-    <div className="af-root af-page">
+    <div className="af-root af-page" style={{ position: "relative" }}>
       {/* Grid bg */}
       <div className="af-grid" />
 

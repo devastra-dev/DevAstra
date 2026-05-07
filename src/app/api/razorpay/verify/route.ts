@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     // ❌ ENV CHECK
     if (!keySecret) {
+      // eslint-disable-next-line no-console
       console.error("Missing RAZORPAY_KEY_SECRET");
       return NextResponse.json(
         { error: "Server misconfigured" },
@@ -75,7 +76,10 @@ export async function POST(req: NextRequest) {
       .digest("hex");
 
     if (expectedSignature !== razorpay_signature) {
-      console.warn("Invalid Razorpay signature:", razorpay_order_id);
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console
+        console.warn("Invalid Razorpay signature:", razorpay_order_id);
+      }
 
       return NextResponse.json(
         { error: "Invalid signature" },
@@ -99,22 +103,14 @@ export async function POST(req: NextRequest) {
     // 💰 PRODUCT VALIDATION
     const product = products.find((p) => p.id === productId);
 
-    let amountInINR: number;
-
-    if (product) {
-      amountInINR = product.priceInINR;
-    } else if (
-      typeof amountInINRBody === "number" &&
-      Number.isFinite(amountInINRBody) &&
-      amountInINRBody > 0
-    ) {
-      amountInINR = amountInINRBody;
-    } else {
+    if (!product) {
       return NextResponse.json(
-        { error: "Invalid product or amount" },
-        { status: 400 }
+        { error: "Product not found" },
+        { status: 404 }
       );
     }
+
+    const amountInINR = product.priceInINR;
 
     // 💾 SAVE ORDER
     await saveOrderAdmin({
@@ -125,11 +121,10 @@ export async function POST(req: NextRequest) {
       razorpayPaymentId: razorpay_payment_id
     });
 
-    console.log("✅ Order saved:", {
-      email,
-      productId,
-      amountInINR
-    });
+    if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console
+      console.log("✅ Order saved:", { email, productId, amountInINR });
+    }
 
     // 🔥 INVOICE + EMAIL
     try {
@@ -150,9 +145,13 @@ export async function POST(req: NextRequest) {
           invoiceBuffer
         });
 
-        console.log("📧 Invoice email sent:", email);
+        if (process.env.NODE_ENV === "development") {
+          // eslint-disable-next-line no-console
+          console.log("📧 Invoice email sent:", email);
+        }
       }
     } catch (emailErr) {
+      // eslint-disable-next-line no-console
       console.error("Email/Invoice error:", emailErr);
       // ❗ important: payment fail না
     }
@@ -162,6 +161,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("❌ Verify error:", error);
 
     return NextResponse.json(

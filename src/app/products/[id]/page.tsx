@@ -189,7 +189,7 @@ export default function ProductDetailPage() {
     : handleBuyNow;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#070a10]">
+    <main className="relative min-h-screen overflow-hidden bg-[#070a10]" style={{ position: "relative" }}>
 
       {/* ── AMBIENT BACKGROUND ─────────────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -201,11 +201,11 @@ export default function ProductDetailPage() {
         <div className="absolute top-1/3 left-[-5%] w-[400px] h-[400px] rounded-full"
           style={{ background: "radial-gradient(ellipse at center, rgba(168,85,247,.07) 0%, transparent 70%)" }} />
 
-        {/* subtle grid */}
+        {/* subtle dot pattern */}
         <div className="absolute inset-0 opacity-[0.025]"
           style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.4) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
+            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,.5) 1px, transparent 0)",
+            backgroundSize: "32px 32px",
           }} />
 
         {/* top edge glow line */}

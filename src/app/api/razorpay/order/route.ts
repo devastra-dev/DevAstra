@@ -26,24 +26,15 @@ export async function POST(req: NextRequest) {
     }
 
     const staticProduct = products.find((p) => p.id === productId);
-    let amountPaise: number;
-    if (staticProduct) {
-      amountPaise = staticProduct.priceInINR * 100;
-    } else if (
-      typeof body.amountInINR === "number" &&
-      Number.isFinite(body.amountInINR) &&
-      body.amountInINR > 0
-    ) {
-      amountPaise = Math.round(body.amountInINR * 100);
-    } else {
+    
+    if (!staticProduct) {
       return NextResponse.json(
-        { error: "Invalid product or missing amountInINR" },
-        { status: 400 }
+        { error: "Product not found" },
+        { status: 404 }
       );
     }
 
-    console.log("KEY_ID:", process.env.RAZORPAY_KEY_ID);
-    console.log("KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET);
+    const amountPaise = staticProduct.priceInINR * 100;
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       throw new Error("Razorpay keys missing in environment variables");
@@ -71,10 +62,8 @@ export async function POST(req: NextRequest) {
       currency: order.currency
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error creating Razorpay order", error);
-    if (error && typeof error === "object") {
-      console.error("Razorpay error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
-    }
 
     if (error instanceof Error && error.message === "Razorpay keys missing in environment variables") {
       return NextResponse.json(

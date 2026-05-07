@@ -2,362 +2,65 @@
 
 import { products, Product } from "@/lib/products";
 import Link from "next/link";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
 import { usePurchaseStatus } from "@/hooks/usePurchaseStatus";
-import { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
+import Image from "next/image";
 
-/* ─────────────────────────────────────────────────
-   FONT INJECTION  (Orbitron for headings)
-───────────────────────────────────────────────── */
-function FontLoader() {
-  useEffect(() => {
-    if (document.getElementById("orbitron-font")) return;
-    const link = document.createElement("link");
-    link.id = "orbitron-font";
-    link.rel = "stylesheet";
-    link.href =
-      "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap";
-    document.head.appendChild(link);
-  }, []);
-  return null;
-}
+/* ── FILTER TABS ── */
+type Filter = "all" | "free" | "premium";
+type Sort = "default" | "price-asc" | "price-desc";
 
-/* ─────────────────────────────────────────────────
-   GLOBAL CSS (keyframes + utilities)
-───────────────────────────────────────────────── */
-const globalStyles = `
-  @keyframes scan {
-    0%   { top: -4px; }
-    100% { top: 100%; }
-  }
-  @keyframes aurora-rotate {
-    0%   { --aurora-angle: 0deg; }
-    100% { --aurora-angle: 360deg; }
-  }
-  @keyframes shimmer-move {
-    0%   { background-position: -200% center; }
-    100% { background-position: 200% center; }
-  }
-  @keyframes glitch-1 {
-    0%, 94%, 100% { clip-path: none; transform: none; opacity: 1; }
-    95% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); transform: translateX(-4px); opacity: 0.8; }
-    97% { clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%); transform: translateX(4px); opacity: 0.8; }
-  }
-  @keyframes glitch-2 {
-    0%, 92%, 100% { clip-path: none; transform: none; opacity: 0; }
-    93% { clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%); transform: translateX(6px); opacity: 0.5; color: #ff0060; }
-    96% { clip-path: polygon(0 55%, 100% 55%, 100% 70%, 0 70%); transform: translateX(-6px); opacity: 0.5; color: #00ffcc; }
-  }
-  @keyframes float-particle {
-    0%   { transform: translateY(0px) translateX(0px); opacity: 0; }
-    10%  { opacity: 1; }
-    90%  { opacity: 0.6; }
-    100% { transform: translateY(-120px) translateX(20px); opacity: 0; }
-  }
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 6px rgba(0,255,200,0.4), 0 0 12px rgba(0,255,200,0.2); }
-    50%       { box-shadow: 0 0 12px rgba(0,255,200,0.7), 0 0 24px rgba(0,255,200,0.4); }
-  }
-  @keyframes border-trace {
-    0%   { background-position: 0% 0%; }
-    100% { background-position: 200% 200%; }
-  }
-  @keyframes count-up {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes holo-shift {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  .orbitron { font-family: 'Orbitron', monospace; }
-  .share-tech { font-family: 'Share Tech Mono', monospace; }
-  .glitch-text {
-    position: relative;
-    animation: glitch-1 8s infinite;
-  }
-  .glitch-text::after {
-    content: attr(data-text);
-    position: absolute;
-    left: 0; top: 0;
-    animation: glitch-2 8s infinite;
-    pointer-events: none;
-  }
-  .holo-card:hover .holo-overlay {
-    opacity: 1 !important;
-  }
-  .btn-shine {
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-shine::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -75%;
-    width: 50%;
-    height: 200%;
-    background: linear-gradient(
-      to right,
-      rgba(255,255,255,0) 0%,
-      rgba(0,255,200,0.15) 50%,
-      rgba(255,255,255,0) 100%
-    );
-    transform: skewX(-20deg);
-    transition: left 0s;
-    pointer-events: none;
-  }
-  .btn-shine:hover::after {
-    left: 125%;
-    transition: left 0.5s ease;
-  }
-`;
-
-/* ─────────────────────────────────────────────────
-   FLOATING PARTICLES BACKGROUND
-───────────────────────────────────────────────── */
-function ParticleField() {
-  const particles = useMemo(
-    () => Array.from({ length: 20 }, (_, i) => ({
-      id: i,
-      // eslint-disable-next-line react-hooks/purity
-      left: `${Math.random() * 100}%`,
-      // eslint-disable-next-line react-hooks/purity
-      delay: `${Math.random() * 8}s`,
-      // eslint-disable-next-line react-hooks/purity
-      duration: `${6 + Math.random() * 8}s`,
-      // eslint-disable-next-line react-hooks/purity
-      size: Math.random() > 0.7 ? 3 : 2,
-    })),
-    []
-  );
+function FilterBar({ active, onFilter, sort, onSort, counts }: {
+  active: Filter; onFilter: (f: Filter) => void; sort: Sort; onSort: (s: Sort) => void;
+  counts: { all: number; free: number; premium: number };
+}) {
+  const tabs: { key: Filter; label: string; count: number }[] = [
+    { key: "all", label: "All", count: counts.all },
+    { key: "free", label: "Free", count: counts.free },
+    { key: "premium", label: "Premium", count: counts.premium },
+  ];
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="absolute rounded-full bg-cyan-400"
-          style={{
-            left: p.left,
-            bottom: "0",
-            width: p.size,
-            height: p.size,
-            opacity: 0,
-            animation: `float-particle ${p.duration} ${p.delay} infinite linear`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────
-   MAIN PAGE
-───────────────────────────────────────────────── */
-export default function ProductsPage() {
-  const freeProducts = products.filter((p) => p.isFree);
-  const paidProducts = products.filter((p) => !p.isFree);
-
-  return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
-      <FontLoader />
-
-      <main className="relative overflow-hidden min-h-screen">
-
-        {/* ── LAYERED SCI-FI BACKGROUND ── */}
-        <div className="absolute inset-0 -z-10 bg-[#030712]">
-          {/* Deep grid */}
-          <div className="absolute inset-0"
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex items-center gap-2 rounded-xl p-1" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => onFilter(t.key)}
+            className="relative px-4 py-2 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all duration-300"
             style={{
-              backgroundImage: `
-                linear-gradient(rgba(0,255,200,0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,255,200,0.04) 1px, transparent 1px)
-              `,
-              backgroundSize: "48px 48px",
+              color: active === t.key ? "#fff" : "#64748b",
+              background: active === t.key ? "rgba(124,58,237,0.15)" : "transparent",
+              border: active === t.key ? "1px solid rgba(124,58,237,0.3)" : "1px solid transparent",
             }}
-          />
-          {/* Perspective grid floor */}
-          <div className="absolute bottom-0 left-0 right-0 h-64"
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(0,255,200,0.06) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,255,200,0.06) 1px, transparent 1px)
-              `,
-              backgroundSize: "48px 48px",
-              transform: "perspective(400px) rotateX(60deg)",
-              transformOrigin: "bottom center",
-              maskImage: "linear-gradient(to bottom, transparent 0%, black 40%)",
-            }}
-          />
-          {/* Glow orbs */}
-          <div className="absolute w-[700px] h-[700px] rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(0,200,255,0.07) 0%, transparent 70%)",
-              top: "-200px", left: "30%",
-            }}
-          />
-          <div className="absolute w-[500px] h-[500px] rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(120,0,255,0.06) 0%, transparent 70%)",
-              bottom: "10%", right: "10%",
-            }}
-          />
-          <div className="absolute w-[300px] h-[300px] rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(0,255,160,0.05) 0%, transparent 70%)",
-              bottom: "30%", left: "5%",
-            }}
-          />
-          {/* Horizontal scan line across page */}
-          <div className="absolute inset-x-0 h-[1px] top-1/3"
-            style={{ background: "linear-gradient(to right, transparent, rgba(0,255,200,0.08), transparent)" }}
-          />
-        </div>
-
-        {/* Particle field */}
-        <ParticleField />
-
-        <div className="container-page pt-28 pb-24 space-y-24">
-
-          {/* ── PREMIUM HEADER ── */}
-          <div className="space-y-6 text-center md:text-left relative">
-            {/* corner bracket decoration */}
-            <div className="hidden md:block absolute -left-6 -top-4 w-10 h-10 border-l-2 border-t-2 border-cyan-500/40 rounded-tl-sm" />
-            <div className="hidden md:block absolute -left-6 -top-4 w-3 h-3 bg-cyan-400/60 rounded-full blur-sm" />
-
-            {/* eyebrow label */}
-            <p className="share-tech text-xs text-cyan-500/70 tracking-[0.25em] uppercase flex items-center gap-2 justify-center md:justify-start">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              ◈ PRODUCT CATALOG v2.0
-            </p>
-
-            {/* glitch main title */}
-            <h1
-              className="orbitron glitch-text text-5xl md:text-7xl font-black tracking-widest"
-              data-text="PRODUCTS"
-              style={{
-                background: "linear-gradient(135deg, #ffffff 0%, #22d3ee 40%, #818cf8 70%, #ffffff 100%)",
-                backgroundSize: "200% 200%",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                animation: "holo-shift 5s ease-in-out infinite",
-                filter: "drop-shadow(0 0 30px rgba(0,255,200,0.12))",
-              }}
-            >
-              PRODUCTS
-            </h1>
-
-            {/* sub line */}
-            <p className="share-tech text-slate-400 max-w-lg text-base tracking-wider leading-relaxed">
-              Explore futuristic developer tools &amp; premium assets.
-            </p>
-
-            {/* stat chips */}
-            <div className="flex gap-4 flex-wrap mt-3 justify-center md:justify-start">
-              <StatChip label="FREE" count={freeProducts.length} color="#00ffc8" />
-              <StatChip label="PREMIUM" count={paidProducts.length} color="#00b4ff" />
-              <StatChip label="TOTAL" count={products.length} color="#a78bfa" />
-            </div>
-
-            {/* decorative separator */}
-            <div className="flex items-center gap-3 mt-8 justify-center md:justify-start">
-              <div className="h-[1px] flex-1 max-w-xs"
-                style={{ background: "linear-gradient(to right, rgba(0,255,200,0.5), rgba(0,180,255,0.2), transparent)" }}
-              />
-              <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
-            </div>
-          </div>
-
-          {/* ── FREE PRODUCTS ── */}
-          {freeProducts.length > 0 && (
-            <section className="space-y-8">
-              <SectionHeader label="Free Products" color="#4ade80" tag="FREE_TIER" />
-              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                {freeProducts.map((p, i) => (
-                  <TiltCard key={p.id} product={p} delay={i * 0.08} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ── PREMIUM PRODUCTS ── */}
-          <section className="space-y-8">
-            <SectionHeader label="Premium Products" color="#67e8f9" tag="PRO_TIER" />
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {paidProducts.map((p, i) => (
-                <TiltCard key={p.id} product={p} delay={i * 0.08} />
-              ))}
-            </div>
-          </section>
-
-        </div>
-      </main>
-    </>
-  );
-}
-
-/* ─────────────────────────────────────────────────
-   STAT CHIP
-───────────────────────────────────────────────── */
-function StatChip({ label, count, color }: { label: string; count: number; color: string }) {
-  return (
-    <div
-      className="share-tech text-xs px-4 py-2 rounded-full flex items-center gap-2.5 transition-all duration-300 hover:scale-105 cursor-default"
-      style={{
-        border: `1px solid ${color}35`,
-        background: `${color}0a`,
-        color,
-        boxShadow: `0 0 12px ${color}08`,
-      }}
-    >
-      <span className="w-1.5 h-1.5 rounded-full" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
-      <span className="opacity-70">{label}</span>
-      <span className="font-bold text-sm" style={{ animation: "count-up 0.6s ease forwards" }}>
-        {count}
-      </span>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────
-   SECTION HEADER
-───────────────────────────────────────────────── */
-function SectionHeader({ label, color, tag }: { label: string; color: string; tag: string }) {
-  return (
-    <div className="flex items-center gap-4">
-      <div className="w-1 h-8 rounded-full" style={{ background: color, boxShadow: `0 0 12px ${color}80` }} />
-      <div>
-        <p className="share-tech text-[10px] tracking-[0.2em] opacity-40" style={{ color }}>
-          {tag}
-        </p>
-        <h2 className="orbitron text-xl font-semibold tracking-wide" style={{ color }}>
-          {label}
-        </h2>
+          >
+            {t.label}
+            <span className="ml-1.5 text-[10px] opacity-60">{t.count}</span>
+          </button>
+        ))}
       </div>
-      <div className="flex-1 h-[1px] ml-2"
-        style={{ background: `linear-gradient(to right, ${color}30, transparent)` }}
-      />
+      <select
+        value={sort}
+        onChange={(e) => onSort(e.target.value as Sort)}
+        className="text-xs font-mono text-slate-400 bg-transparent rounded-lg px-3 py-2 cursor-pointer outline-none"
+        style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)" }}
+      >
+        <option value="default" style={{ background: "#0c0d1e" }}>Default</option>
+        <option value="price-asc" style={{ background: "#0c0d1e" }}>Price: Low → High</option>
+        <option value="price-desc" style={{ background: "#0c0d1e" }}>Price: High → Low</option>
+      </select>
     </div>
   );
 }
 
-/* ─────────────────────────────────────────────────
-   TILT CARD  (all original logic kept, visuals maxed)
-───────────────────────────────────────────────── */
-function TiltCard({ product, delay }: { product: Product; delay: number }) {
+/* ── PRODUCT CARD ── */
+function ProductCard({ product, delay }: { product: Product; delay: number }) {
   const { purchased } = usePurchaseStatus(product.id);
-
-  /* original motion values */
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-80, 80], [8, -8]);
-  const rotateY = useTransform(x, [-80, 80], [-8, 8]);
-
-  /* spotlight tracking */
+  const rotateX = useTransform(y, [-80, 80], [6, -6]);
+  const rotateY = useTransform(x, [-80, 80], [-6, 6]);
   const cardRef = useRef<HTMLDivElement>(null);
   const [spotlight, setSpotlight] = useState({ x: 50, y: 50, active: false });
 
@@ -366,260 +69,110 @@ function TiltCard({ product, delay }: { product: Product; delay: number }) {
     const cx = e.clientX - rect.left;
     const cy = e.clientY - rect.top;
     x.set(cx - rect.width / 2);
-    y.set(cy - rect.top - rect.height / 2);
-    setSpotlight({
-      x: (cx / rect.width) * 100,
-      y: (cy / rect.height) * 100,
-      active: true,
-    });
+    y.set(cy - rect.height / 2);
+    setSpotlight({ x: (cx / rect.width) * 100, y: (cy / rect.height) * 100, active: true });
   };
 
   const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
+    x.set(0); y.set(0);
     setSpotlight((prev) => ({ ...prev, active: false }));
   };
-
-  /* aurora border angle driven by x */
-  const aurAngle = useTransform(x, [-80, 80], [200, 340]);
 
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, type: "spring", stiffness: 90, damping: 18 }}
-      whileHover={{ scale: 1.025 }}
+      whileHover={{ scale: 1.02 }}
       style={{ rotateX, rotateY, perspective: 1000 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="holo-card relative group transition-all duration-300 hover:z-20"
+      className="relative group transition-all duration-300 hover:z-20"
     >
-      {/* ── AURORA ANIMATED BORDER ── */}
-      <motion.div
-        className="absolute inset-0 rounded-2xl pointer-events-none"
-        style={{
-          padding: "1px",
-          background: aurAngle.get()
-            ? undefined
-            : "transparent",
-        }}
-      >
-        <div
-          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: `conic-gradient(from 0deg at 50% 50%, 
-              #00ffc8 0deg, #00b4ff 90deg, #7c00ff 180deg, 
-              #ff0080 270deg, #00ffc8 360deg)`,
-            borderRadius: "inherit",
-            padding: "1px",
-            zIndex: 0,
-          }}
-        >
-          <div className="absolute inset-[1px] rounded-[calc(1rem-1px)] bg-[#070c18]" />
-        </div>
-      </motion.div>
+      {/* Hover border */}
+      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.2), rgba(124,58,237,0.3))", padding: "1px", borderRadius: "inherit" }}>
+        <div className="absolute inset-[1px] rounded-[calc(1rem-1px)]" style={{ background: "#0a0e1a" }} />
+      </div>
 
-      {/* ── STATIC BORDER (always visible) ── */}
-      <div className="absolute inset-0 rounded-2xl border border-white/8 pointer-events-none" />
+      {/* Static border */}
+      <div className="absolute inset-0 rounded-2xl border border-white/[0.07] pointer-events-none" />
 
-      {/* ── MAIN CARD BODY ── */}
-      <div className="relative rounded-2xl p-6 overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, rgba(7,12,24,0.95), rgba(10,18,36,0.9))",
-          backdropFilter: "blur(16px)",
-          boxShadow: spotlight.active
-            ? `0 0 50px rgba(0,255,200,0.08), 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)`
-            : `0 0 20px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)`,
-          transition: "box-shadow 0.4s ease, background 0.4s ease",
-        }}
-      >
-        {/* MOUSE SPOTLIGHT */}
-        <div
-          className="absolute inset-0 pointer-events-none transition-opacity duration-300"
-          style={{
-            opacity: spotlight.active ? 1 : 0,
-            background: `radial-gradient(circle at ${spotlight.x}% ${spotlight.y}%, rgba(0,255,200,0.07) 0%, transparent 55%)`,
-          }}
-        />
+      {/* Card body */}
+      <div className="relative rounded-2xl p-5 overflow-hidden" style={{
+        background: "linear-gradient(145deg, rgba(12,13,30,0.95), rgba(16,18,42,0.9))",
+        backdropFilter: "blur(16px)",
+        boxShadow: spotlight.active ? "0 0 40px rgba(124,58,237,0.06), 0 8px 32px rgba(0,0,0,0.4)" : "0 0 20px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.3)",
+        transition: "box-shadow 0.4s ease",
+      }}>
+        {/* Spotlight */}
+        <div className="absolute inset-0 pointer-events-none transition-opacity duration-300" style={{ opacity: spotlight.active ? 1 : 0, background: `radial-gradient(circle at ${spotlight.x}% ${spotlight.y}%, rgba(124,58,237,0.06) 0%, transparent 55%)` }} />
 
-        {/* HOLOGRAPHIC SHIMMER */}
-        <div
-          className="holo-overlay absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-500 rounded-2xl"
-          style={{
-            background: `linear-gradient(
-              105deg,
-              transparent 20%,
-              rgba(0,255,200,0.04) 30%,
-              rgba(0,180,255,0.06) 45%,
-              rgba(120,0,255,0.04) 55%,
-              transparent 65%
-            )`,
-            backgroundSize: "200% 200%",
-            animation: "holo-shift 4s linear infinite",
-          }}
-        />
+        {/* Image */}
+        <div className="h-44 rounded-xl overflow-hidden relative" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
+          <Image src={product.images?.[0] || ""} alt={product.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition-all duration-700 group-hover:scale-110" style={{ opacity: spotlight.active ? 0.9 : 0.65, transition: "opacity 0.4s, transform 0.7s" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(12,13,30,0.95) 0%, rgba(12,13,30,0.3) 50%, transparent 100%)" }} />
 
-        {/* SCAN LINE */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
-          <div className="absolute w-full bg-gradient-to-b from-transparent via-cyan-400/20 to-transparent"
-            style={{ height: "6px", animation: "scan 4s linear infinite" }}
-          />
-        </div>
-
-        {/* IMAGE AREA */}
-        <div className="mt-2 h-48 rounded-xl overflow-hidden relative"
-          style={{ border: "1px solid rgba(255,255,255,0.08)" }}
-        >
-          <img
-            src={product.images?.[0]}
-            alt={product.title}
-            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-            style={{ opacity: spotlight.active ? 0.95 : 0.7, transition: "opacity 0.4s, transform 0.7s, filter 0.7s" }}
-          />
-          {/* gradient overlay */}
-          <div className="absolute inset-0"
-            style={{ background: "linear-gradient(to top, rgba(7,12,24,0.95) 0%, rgba(7,12,24,0.4) 50%, rgba(7,12,24,0.1) 100%)" }}
-          />
-          {/* holographic sheen on hover */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-            style={{ background: "linear-gradient(135deg, transparent 30%, rgba(0,255,200,0.06) 50%, rgba(0,180,255,0.04) 60%, transparent 70%)" }}
-          />
-          {/* corner HUD marks */}
-          <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-cyan-400/40 transition-all duration-300 group-hover:border-cyan-400/70 group-hover:w-5 group-hover:h-5" />
-          <div className="absolute top-2 right-2 w-4 h-4 border-t border-r border-cyan-400/40 transition-all duration-300 group-hover:border-cyan-400/70 group-hover:w-5 group-hover:h-5" />
-          <div className="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-cyan-400/40 transition-all duration-300 group-hover:border-cyan-400/70 group-hover:w-5 group-hover:h-5" />
-          <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-cyan-400/40 transition-all duration-300 group-hover:border-cyan-400/70 group-hover:w-5 group-hover:h-5" />
-          {/* badge overlay */}
+          {/* Badge */}
           {product.badge && (
-            <div className="absolute top-3 right-3 z-10">
-              <span
-                className="share-tech text-[9px] px-2.5 py-1 rounded-full tracking-widest uppercase"
-                style={{
-                  background: "rgba(0,180,255,0.15)",
-                  border: "1px solid rgba(0,180,255,0.35)",
-                  color: "#67e8f9",
-                  backdropFilter: "blur(8px)",
-                }}
-              >
-                {product.badge}
-              </span>
-            </div>
+            <span className="absolute top-3 right-3 z-10 text-[9px] font-mono font-bold px-2.5 py-1 rounded-full tracking-widest uppercase" style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.35)", color: "#a78bfa", backdropFilter: "blur(8px)" }}>
+              {product.badge}
+            </span>
+          )}
+
+          {/* Free badge */}
+          {product.isFree && (
+            <span className="absolute top-3 left-3 z-10 text-[9px] font-mono font-bold px-2.5 py-1 rounded-full tracking-widest" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)", color: "#34d399" }}>
+              ◈ FREE
+            </span>
+          )}
+
+          {/* Purchased badge */}
+          {purchased && (
+            <span className="absolute top-3 right-3 z-10 text-[9px] font-mono font-bold px-2.5 py-1 rounded-full flex items-center gap-1 tracking-wider" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)", color: "#34d399" }}>
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" /></svg>
+              OWNED
+            </span>
           )}
         </div>
 
-        {/* FREE BADGE */}
-        {product.isFree && (
-          <div
-            className="share-tech absolute top-3 left-3 text-[10px] px-2.5 py-1 rounded-full tracking-widest"
-            style={{
-              background: "rgba(74,222,128,0.08)",
-              color: "#4ade80",
-              border: "1px solid rgba(74,222,128,0.25)",
-              animation: "pulse-glow 2.5s ease-in-out infinite",
-            }}
-          >
-            ◈ FREE
-          </div>
-        )}
+        {/* Content */}
+        <div className="relative z-10 mt-4 space-y-2">
+          <p className="text-[10px] font-mono tracking-[0.15em] text-violet-400/60 uppercase">{product.stackLabel}</p>
+          <h2 className="text-[0.95rem] font-semibold text-white tracking-wide leading-snug">{product.title}</h2>
+          <p className="text-[12px] text-slate-400/80 line-clamp-2 leading-relaxed">{product.description}</p>
 
-        {/* PURCHASED BADGE */}
-        {purchased && (
-          <div
-            className="share-tech absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1 tracking-wider"
-            style={{
-              background: "rgba(0,255,200,0.08)",
-              color: "#00ffc8",
-              border: "1px solid rgba(0,255,200,0.25)",
-            }}
-          >
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="#00ffc8" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            OWNED
-          </div>
-        )}
-
-        {/* CONTENT */}
-        <div className="relative z-10 mt-5 space-y-2">
-          {/* stack label */}
-          <p className="share-tech text-[10px] tracking-[0.15em] text-cyan-500/60 uppercase">
-            {product.stackLabel}
-          </p>
-
-          {/* title */}
-          <h2
-            className="orbitron text-base font-semibold text-white tracking-wide leading-snug"
-            style={{ textShadow: "0 0 20px rgba(255,255,255,0.1)" }}
-          >
-            {product.title}
-          </h2>
-
-          {/* description */}
-          <p className="text-[12.5px] text-slate-400/80 line-clamp-2 leading-relaxed mt-1.5">
-            {product.description}
-          </p>
-
-          {/* PRICE */}
-          <div className="mt-4">
+          {/* Price */}
+          <div className="mt-3 flex items-baseline gap-2">
             {product.isFree ? (
-              <p
-                className="orbitron font-bold text-xl"
-                style={{ color: "#4ade80", textShadow: "0 0 12px rgba(74,222,128,0.4)" }}
-              >
-                FREE
-              </p>
+              <span className="font-bold text-lg text-emerald-400">FREE</span>
             ) : (
-              <div className="flex items-baseline gap-2">
-                {product.originalPrice && (
-                  <span className="share-tech text-xs line-through text-slate-600">
-                    ₹{product.originalPrice}
-                  </span>
-                )}
-                <span
-                  className="orbitron font-bold text-xl tracking-wide"
-                  style={{ color: "#00e5ff", textShadow: "0 0 14px rgba(0,229,255,0.4)" }}
-                >
-                  ₹{product.priceInINR}
-                </span>
-                {product.originalPrice && (
-                  <span
-                    className="share-tech text-[10px] px-1.5 py-0.5 rounded"
-                    style={{
-                      background: "rgba(0,229,255,0.08)",
-                      color: "#00e5ff",
-                      border: "1px solid rgba(0,229,255,0.2)",
-                    }}
-                  >
-                    DEAL
-                  </span>
-                )}
-              </div>
+              <>
+                {product.originalPrice && <span className="text-xs line-through text-slate-600 font-mono">₹{product.originalPrice}</span>}
+                <span className="font-bold text-lg font-mono" style={{ background: "linear-gradient(135deg, #a78bfa, #60a5fa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>₹{product.priceInINR}</span>
+                {product.originalPrice && <span className="text-[9px] px-1.5 py-0.5 rounded font-mono" style={{ background: "rgba(124,58,237,0.1)", color: "#a78bfa", border: "1px solid rgba(124,58,237,0.2)" }}>DEAL</span>}
+              </>
             )}
           </div>
 
-          {/* CTA BUTTON */}
+          {/* CTA */}
           <Link
             href={`/products/${product.id}`}
-            className="btn-shine mt-5 w-full inline-flex items-center justify-center gap-2.5 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-400 group/btn"
-            style={{
-              background: "linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(0,180,255,0.04) 100%)",
-              border: "1px solid rgba(0,229,255,0.2)",
-              color: "#67e8f9",
-              fontFamily: "'Share Tech Mono', monospace",
-              letterSpacing: "0.08em",
-            }}
+            className="mt-4 w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 group/btn"
+            style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.08), rgba(37,99,235,0.04))", border: "1px solid rgba(124,58,237,0.2)", color: "#a78bfa", fontFamily: "'Space Mono', monospace", letterSpacing: "0.06em" }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, rgba(0,229,255,0.15) 0%, rgba(0,180,255,0.08) 100%)";
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,229,255,0.5)";
-              (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(0,229,255,0.12), 0 0 60px rgba(0,229,255,0.05)";
-              (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(37,99,235,0.08))";
+              el.style.borderColor = "rgba(124,58,237,0.5)";
+              el.style.boxShadow = "0 0 25px rgba(124,58,237,0.12)";
+              el.style.transform = "translateY(-1px)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(0,180,255,0.04) 100%)";
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,229,255,0.2)";
-              (e.currentTarget as HTMLElement).style.boxShadow = "none";
-              (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "linear-gradient(135deg, rgba(124,58,237,0.08), rgba(37,99,235,0.04))";
+              el.style.borderColor = "rgba(124,58,237,0.2)";
+              el.style.boxShadow = "none";
+              el.style.transform = "translateY(0)";
             }}
           >
             <span>VIEW PRODUCT</span>
@@ -630,5 +183,72 @@ function TiltCard({ product, delay }: { product: Product; delay: number }) {
         </div>
       </div>
     </motion.div>
+  );
+}
+
+/* ── MAIN PAGE ── */
+export default function ProductsPage() {
+  const [filter, setFilter] = useState<Filter>("all");
+  const [sort, setSort] = useState<Sort>("default");
+
+  const freeProducts = products.filter((p) => p.isFree);
+  const paidProducts = products.filter((p) => !p.isFree);
+  const counts = { all: products.length, free: freeProducts.length, premium: paidProducts.length };
+
+  const filtered = useMemo(() => {
+    let list = filter === "free" ? freeProducts : filter === "premium" ? paidProducts : [...products];
+    if (sort === "price-asc") list = [...list].sort((a, b) => a.priceInINR - b.priceInINR);
+    if (sort === "price-desc") list = [...list].sort((a, b) => b.priceInINR - a.priceInINR);
+    return list;
+  }, [filter, sort, freeProducts, paidProducts]);
+
+  return (
+    <main className="relative overflow-hidden min-h-screen" style={{ position: "relative" }}>
+      {/* Background */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute w-[600px] h-[600px] rounded-full" style={{ background: "radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%)", top: "-180px", left: "25%", filter: "blur(60px)" }} />
+        <div className="absolute w-[400px] h-[400px] rounded-full" style={{ background: "radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%)", bottom: "10%", right: "10%", filter: "blur(60px)" }} />
+      </div>
+
+      <div className="container-page pt-28 pb-24 space-y-10">
+
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="space-y-4">
+          <p className="text-[10px] font-mono text-violet-400 tracking-[0.25em] uppercase flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+            Product Catalog
+          </p>
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight" style={{
+            background: "linear-gradient(135deg, #fff 0%, #a78bfa 40%, #60a5fa 70%, #fff 100%)",
+            backgroundSize: "200% 200%",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}>
+            Products
+          </h1>
+          <p className="text-slate-400 max-w-lg text-base leading-relaxed">
+            Explore premium developer tools & production-ready assets.
+          </p>
+        </motion.div>
+
+        {/* Separator */}
+        <div className="h-px" style={{ background: "linear-gradient(to right, rgba(124,58,237,0.4), rgba(6,182,212,0.2), transparent)" }} />
+
+        {/* Filters */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+          <FilterBar active={filter} onFilter={setFilter} sort={sort} onSort={setSort} counts={counts} />
+        </motion.div>
+
+        {/* Product Grid */}
+        <AnimatePresence mode="wait">
+          <motion.div key={filter + sort} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((p, i) => (
+              <ProductCard key={p.id} product={p} delay={i * 0.06} />
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </main>
   );
 }

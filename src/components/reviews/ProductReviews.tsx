@@ -1,10 +1,14 @@
 // components/product/ProductReviews.tsx
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { getReviewsWithStats, type Review } from "@/lib/reviews-client";
 import { useAuth } from "@/components/auth/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
+
+// 🔥 GLOBAL CACHE for reviews (per product)
+const reviewsCache = new Map<string, { reviews: Review[]; avg: number; total: number; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /* ════════════════════════════════════════════
    STAR RATING
@@ -69,7 +73,7 @@ const AVATAR_GRADIENTS = [
 
 function UserAvatar({ email }: { email: string }) {
   const initial = email?.charAt(0)?.toUpperCase() || "?";
-  const idx     = email.charCodeAt(0) % AVATAR_GRADIENTS.length;
+  const idx = email.charCodeAt(0) % AVATAR_GRADIENTS.length;
 
   return (
     <div
@@ -155,16 +159,16 @@ function PanelCard({
   style?: React.CSSProperties;
 }) {
   const colors: Record<string, string> = {
-    cyan:  "rgba(0,245,255,0.4)",
-    gold:  "rgba(255,204,68,0.4)",
+    cyan: "rgba(0,245,255,0.4)",
+    gold: "rgba(255,204,68,0.4)",
     green: "rgba(0,245,100,0.4)",
-    red:   "rgba(255,68,85,0.4)",
+    red: "rgba(255,68,85,0.4)",
   };
   const leftBorder: Record<string, string> = {
-    cyan:  "#00f5ff",
-    gold:  "#ffcc44",
+    cyan: "#00f5ff",
+    gold: "#ffcc44",
     green: "#00f564",
-    red:   "#ff4455",
+    red: "#ff4455",
   };
 
   return (
@@ -240,33 +244,76 @@ function SortChip({
 export function ProductReviews({ productId }: { productId: string }) {
   const { user } = useAuth();
 
-  const [reviews,    setReviews]    = useState<Review[]>([]);
-  const [rating,     setRating]     = useState(5);
-  const [comment,    setComment]    = useState("");
-  const [avg,        setAvg]        = useState(0);
-  const [total,      setTotal]      = useState(0);
-  const [loading,    setLoading]    = useState(false);
-  const [error,      setError]      = useState<string | null>(null);
-  const [sort,       setSort]       = useState<"latest" | "highest">("latest");
-  const [charCount,  setCharCount]  = useState(0);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [avg, setAvg] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState<"latest" | "highest">("latest");
+  const [charCount, setCharCount] = useState(0);
+
+  const isMountedRef = useRef(true);
 
   /* ── LOAD ── */
   const load = useCallback(async () => {
+    // Check cache first
+    const cached = reviewsCache.get(productId);
+    const now = Date.now();
+    if (cached && (now - cached.timestamp) < CACHE_TTL) {
+      // Use cached data
+      const sorted = [...cached.reviews];
+      if (sort === "highest") sorted.sort((a, b) => b.rating - a.rating);
+      setReviews(sorted);
+      setAvg(cached.avg);
+      setTotal(cached.total);
+      return;
+    }
+
     try {
       setError(null);
+      setLoading(true);
       const data = await getReviewsWithStats(productId);
+
+      // Save to cache
+      reviewsCache.set(productId, {
+        reviews: data.reviews,
+        avg: data.avg,
+        total: data.total,
+        timestamp: now
+      });
+
+      if (!isMountedRef.current) return;
+
       const sorted = [...data.reviews];
       if (sort === "highest") sorted.sort((a, b) => b.rating - a.rating);
       setReviews(sorted);
       setAvg(data.avg);
       setTotal(data.total);
     } catch (err) {
-      console.error("❌ Review load failed:", err);
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console
+        console.error("❌ Review load failed:", err);
+      }
       setError("Unable to load reviews. Please try again.");
+    } finally {
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [productId, sort]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    isMountedRef.current = true;
+    const timeout = setTimeout(() => {
+      load();
+    }, 0);
+    return () => {
+      isMountedRef.current = false;
+      clearTimeout(timeout);
+    };
+  }, [load]);
 
   /* ── FORMAT DATE ── */
   const formatDate = (value: unknown) => {
@@ -279,7 +326,7 @@ export function ProductReviews({ productId }: { productId: string }) {
 
   /* ── SUBMIT ── */
   const handleSubmit = async () => {
-    if (!user)          return alert("Login required");
+    if (!user) return alert("Login required");
     if (!comment.trim()) return alert("Write something first");
 
     setLoading(true);
@@ -306,50 +353,14 @@ export function ProductReviews({ productId }: { productId: string }) {
     }
   };
 
-  /* ────────────────────────────────────────
-     STYLES (global, injected once)
-  ──────────────────────────────────────── */
   return (
     <>
-      <style>{`
-        .rev-textarea {
-          width: 100%; padding: 14px 16px; resize: vertical; min-height: 110px;
-          background: rgba(0,10,20,0.5); border: 1px solid rgba(0,245,255,0.12);
-          border-radius: 3px; color: #a8d8e8; outline: none;
-          font-family: 'Rajdhani',sans-serif; font-size: 15px; font-weight: 400;
-          transition: border-color .2s, box-shadow .2s;
-        }
-        .rev-textarea:focus {
-          border-color: rgba(0,245,255,0.4);
-          box-shadow: 0 0 12px rgba(0,245,255,0.07);
-        }
-        .rev-textarea::placeholder { color: #4a7a8a; }
-        .rev-submit {
-          display: inline-flex; align-items: center; gap: 8px;
-          padding: 12px 26px; border-radius: 3px; cursor: pointer;
-          border: 1px solid rgba(0,245,255,0.35);
-          background: linear-gradient(135deg,rgba(0,245,255,0.12),rgba(0,245,255,0.06));
-          font-family: 'Share Tech Mono',monospace; font-size: 12px;
-          letter-spacing: 1.5px; text-transform: uppercase; color: #00f5ff;
-          position: relative; overflow: hidden;
-          transition: transform .25s, box-shadow .25s, border-color .25s;
-        }
-        .rev-submit::before {
-          content: ''; position: absolute; inset: 0;
-          background: linear-gradient(110deg,transparent 30%,rgba(255,255,255,0.07) 50%,transparent 70%);
-          transform: translateX(-100%); transition: transform .5s;
-        }
-        .rev-submit:hover::before { transform: translateX(100%); }
-        .rev-submit:hover { border-color: #00f5ff; box-shadow: 0 0 18px rgba(0,245,255,0.15); transform: translateY(-1px); }
-        .rev-submit:active { transform: translateY(0) scale(.98); }
-        .rev-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-      `}</style>
-
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
         style={{ marginTop: 56 }}
+        className="max-w-4xl mx-auto px-4 py-20"
       >
 
         {/* ══════════════════════════════
@@ -391,7 +402,7 @@ export function ProductReviews({ productId }: { productId: string }) {
             {/* Sort chips + total */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <div style={{ display: "flex", gap: 6 }}>
-                <SortChip label="Latest"  active={sort === "latest"}  onClick={() => setSort("latest")} />
+                <SortChip label="Latest" active={sort === "latest"} onClick={() => setSort("latest")} />
                 <SortChip label="Highest" active={sort === "highest"} onClick={() => setSort("highest")} />
               </div>
               <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 10, color: "#4a7a8a", letterSpacing: "1px" }}>
@@ -507,14 +518,14 @@ export function ProductReviews({ productId }: { productId: string }) {
                   onMouseEnter={(e) => {
                     const el = e.currentTarget as HTMLDivElement;
                     el.style.borderColor = "rgba(0,245,255,0.32)";
-                    el.style.boxShadow   = "0 0 16px rgba(0,245,255,0.04)";
-                    el.style.transform   = "translateY(-1px)";
+                    el.style.boxShadow = "0 0 16px rgba(0,245,255,0.04)";
+                    el.style.transform = "translateY(-1px)";
                   }}
                   onMouseLeave={(e) => {
                     const el = e.currentTarget as HTMLDivElement;
                     el.style.borderColor = "rgba(0,245,255,0.10)";
-                    el.style.boxShadow   = "none";
-                    el.style.transform   = "translateY(0)";
+                    el.style.boxShadow = "none";
+                    el.style.transform = "translateY(0)";
                   }}
                 >
                   {/* Top shimmer */}
@@ -568,7 +579,6 @@ export function ProductReviews({ productId }: { productId: string }) {
             </motion.div>
           )}
         </div>
-
       </motion.div>
     </>
   );

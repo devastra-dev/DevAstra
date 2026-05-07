@@ -176,7 +176,7 @@ export default function PrivacyPage() {
 
       <main
         className="privacy-page font-rajdhani relative min-h-screen"
-        style={{ color: "#a8d8e8" }}
+        style={{ color: "#a8d8e8", position: "relative" }}
       >
         {/* Ambient blobs */}
         <div className="blob" style={{ width: 420, height: 420, background: "rgba(0,128,255,0.07)", top: -100, left: -100 }} />

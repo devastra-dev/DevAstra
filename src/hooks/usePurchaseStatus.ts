@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/components/auth/AuthContext";
 
 type PurchaseStatus = {
@@ -11,8 +11,12 @@ type PurchaseStatus = {
 // 🔥 GLOBAL CACHE (PER USER + PRODUCT)
 const purchaseStatusCache = new Map<string, boolean>();
 
+// 🔥 REQUEST DEDUPLICATION - prevent duplicate in-flight requests
+const pendingRequests = new Map<string, Promise<boolean>>();
+
 export function usePurchaseStatus(productId: string): PurchaseStatus {
   const { user } = useAuth();
+  const isMountedRef = useRef(true);
 
   const [status, setStatus] = useState<PurchaseStatus>({
     purchased: false,
@@ -20,12 +24,10 @@ export function usePurchaseStatus(productId: string): PurchaseStatus {
   });
 
   useEffect(() => {
-    let isMounted = true;
+    isMountedRef.current = true;
 
     // ❌ NO USER
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!user || !productId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus({ purchased: false, loading: false });
       return;
     }
@@ -41,20 +43,32 @@ export function usePurchaseStatus(productId: string): PurchaseStatus {
       return;
     }
 
-    const checkPurchase = async () => {
+    // 🔥 REQUEST DEDUPLICATION - Check if request already in flight
+    if (pendingRequests.has(cacheKey)) {
+      pendingRequests.get(cacheKey)!.then((purchased) => {
+        if (isMountedRef.current) {
+          setStatus({ purchased, loading: false });
+        }
+      });
+      return;
+    }
+
+    // Create the request promise
+    const requestPromise = (async (): Promise<boolean> => {
       try {
         setStatus((prev) => ({ ...prev, loading: true }));
 
-        const token = await user.getIdToken(true); // 🔥 force fresh token
+        const token = await user.getIdToken(true);
 
-        // ✅ CORRECT API (NOT download anymore)
         const res = await fetch(
           `/api/purchase-status?productId=${productId}`,
           {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`
-            }
+            },
+            cache: "force-cache",
+            next: { revalidate: 60 }
           }
         );
 
@@ -68,29 +82,36 @@ export function usePurchaseStatus(productId: string): PurchaseStatus {
         // 🔥 CACHE SAVE
         purchaseStatusCache.set(cacheKey, purchased);
 
-        if (!isMounted) return;
+        if (isMountedRef.current) {
+          setStatus({ purchased, loading: false });
+        }
 
-        setStatus({
-          purchased,
-          loading: false
-        });
+        return purchased;
 
       } catch (err) {
-        console.error("❌ Purchase check failed:", err);
+        if (process.env.NODE_ENV === "development") {
+          // eslint-disable-next-line no-console
+          console.error("❌ Purchase check failed:", err);
+        }
 
-        if (!isMounted) return;
+        if (isMountedRef.current) {
+          setStatus({ purchased: false, loading: false });
+        }
 
-        setStatus({
-          purchased: false,
-          loading: false
-        });
+        return false;
       }
-    };
+    })();
 
-    checkPurchase();
+    // Store the promise for deduplication
+    pendingRequests.set(cacheKey, requestPromise);
+
+    // Clean up pending request when done
+    requestPromise.finally(() => {
+      pendingRequests.delete(cacheKey);
+    });
 
     return () => {
-      isMounted = false;
+      isMountedRef.current = false;
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
